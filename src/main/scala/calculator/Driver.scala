@@ -77,7 +77,7 @@ object FullDriver:
               val d = parseAssign(x1).get
               recur(xs, d :: acc)
         case Nil => throw RuntimeException("empty input")
-    val lines = source.lines.toList.asScala.toList
+    val lines = source.linesIterator.toList
     recur(lines, Nil)
 
   case class EvaluatedBlock(defs: List[(String, Double)], expr: FullEvalResult)

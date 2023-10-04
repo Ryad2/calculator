@@ -111,22 +111,3 @@ object Printers:
 
   extension (e: FullExpr)
     def show: String = ExprPrinter.show(e)
-
-  object ExprDiffPrinter:
-    import scala.io.AnsiColor
-    import FullExpr.*
-    import ExprDiff.*
-
-    def showWithDiff(e: FullExpr, diff: ExprDiff, color: String): String =
-      def recur(e: FullExpr, diff: ExprDiff, curLevel: Int): String =
-        val level = ExprPrinter.bindingLevel(e)
-        (e, diff) match
-          case (e, Unchanged)                 => e.show
-          case (e, Changed(_))                => s"${color}${ExprPrinter.show(e, curLevel)}${AnsiColor.RESET}"
-          case (Add(e1, e2), BinOp(d1, d2))   => s"${recur(e1, d1, level)} + ${recur(e2, d2, level + 1)}"
-          case (Minus(e1, e2), BinOp(d1, d2)) => s"${recur(e1, d1, level)} - ${recur(e2, d2, level + 1)}"
-          case (Mul(e1, e2), BinOp(d1, d2))   => s"${recur(e1, d1, level)} * ${recur(e2, d2, level + 1)}"
-          case (Div(e1, e2), BinOp(d1, d2))   => s"${recur(e1, d1, level)} / ${recur(e2, d2, level + 1)}"
-          case (Neg(e), UnaryOp(d))           => s"-${recur(e, d, level)}"
-          case _                              => throw RuntimeException(s"Invalid diff for $e: $diff")
-      recur(e, diff, curLevel = 0)
